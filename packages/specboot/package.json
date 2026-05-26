@@ -1,6 +1,6 @@
 {
   "name": "@lidr/lidr-specboot",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Augmented Spec-driven development powered by OpenSpec. Boot an extended version ofOpenSpec's Spec-Driven workflow in any project and give superpowers to any coding agent. ",
   "keywords": [
     "claude",
@@ -19,7 +19,8 @@
   },
   "files": [
     "bin/",
-    "template/"
+    "template/",
+    "README.md"
   ],
   "engines": {
     "node": ">=18"

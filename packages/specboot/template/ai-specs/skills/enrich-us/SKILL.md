@@ -1,6 +1,6 @@
 ---
 name: enrich-us
-description: Analyze and enhance Jira user stories with complete, implementation-ready technical detail.
+description: Analyze and enhance user stories with complete, implementation-ready technical detail from direct ticket input or Jira.
 author: LIDR.co
 version: 1.0.0
 ---
@@ -10,15 +10,34 @@ Use it when this workflow is required in the project.
 
 ## Instructions
 
-Please analyze and fix the Jira ticket: $ARGUMENTS.
+Please analyze and enrich the ticket: $ARGUMENTS.
+
+**Multi-agent execution** (per `docs/base-standards.md` §8): this skill is owned by the **orchestrator** role. If you are not already orchestrator, invoke it via `Task(subagent_type: orchestrator)` with the ticket as brief. The orchestrator will delegate any required codebase discovery to **explorer** before enriching, and will consult the active pack's domain agent (e.g. `frontend-developer`, `data-scientist`) when stack-specific detail is needed.
 
 Follow these steps:
 
-1. Use Jira MCP to get the ticket details, whether it is the ticket id/number, keywords referring to the ticket or indicating status, like "the one in progress"
-2. You will act as a product expert with technical knowledge
-3. Understand the problem described in the ticket
-4. Decide whether or not the User Story is completely detailed according to product's best practices: Include a full description of the functionality, a comprehensive list of fields to be updated, the structure and URLs of the necessary endpoints, the files to be modified according to the architecture and best practices, the steps required for the task to be considered complete, how to update any relevant documentation or create unit tests, and non-functional requirements related to security, performance, etc
-5. If the user story lacks the technical and specific detail necessary to allow the developer to be fully autonomous when completing it, provide an improved story that is clearer, more specific, and more concise in line with product best practices described in step 4. Use the technical context you will find in 
-@documentation. Return it in markdown format.
-6. Update ticket in Jira, adding the new content after the old one and marking each section with the h2 tags [original] and [enhanced]. Apply proper formatting to make it readable and visually clear, using appropriate text types (lists, code snippets...).
-7. If the ticket status was "To refine", move the task to the "Pending refinement validation" column.
+1. Determine the ticket input source:
+   - **Direct input mode (default when ticket text is provided):** Use the ticket content shared by the user in the prompt/chat.
+   - **Jira mode (optional):** If the user provides a Jira id/key, or asks to use Jira (including references like "the one in progress"), use Jira MCP to fetch the ticket details.
+2. Act as a product expert with technical knowledge.
+3. Understand the problem described in the ticket.
+4. Decide whether or not the User Story is completely detailed according to product best practices. Validate that it includes:
+   - Full functionality description
+   - Comprehensive list of fields to update
+   - Required endpoints structure and URLs
+   - Files/modules to modify according to architecture and best practices
+   - Definition of done (implementation and delivery steps)
+   - Documentation and unit test updates
+   - Non-functional requirements (security, performance, observability, etc.)
+5. If the story lacks enough technical detail for autonomous implementation, provide an improved version that is clearer, more specific, and concise, aligned with step 4. Use project technical context from `@documentation`. Return the result in markdown.
+6. Output format must always include:
+   - `## Original`
+   - `## Enhanced`
+7. Jira write-back is optional and only applies in Jira mode:
+   - Update the Jira ticket by appending the enhanced content after the original content, with clear `h2` sections `[original]` and `[enhanced]` and readable formatting (lists/code snippets when useful).
+   - If ticket status is `To refine`, move it to `Pending refinement validation`.
+
+## Notes
+
+- Do not require Jira when the user already provided full ticket content directly.
+- If input is ambiguous (for example, user gives a short reference without content), ask whether to resolve via Jira or request the full ticket text.

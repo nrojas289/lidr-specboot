@@ -12,6 +12,8 @@ Use it when this workflow is required in the project.
 
 Please analyze and enrich the ticket: $ARGUMENTS.
 
+**Multi-agent execution** (per `docs/base-standards.md` §8): this skill is owned by the **orchestrator** role. If you are not already orchestrator, invoke it via `Task(subagent_type: orchestrator)` with the ticket as brief. The orchestrator will delegate any required codebase discovery to **explorer** before enriching, and will consult the active pack's domain agent (e.g. `frontend-developer`, `data-scientist`) when stack-specific detail is needed.
+
 Follow these steps:
 
 1. Determine the ticket input source:

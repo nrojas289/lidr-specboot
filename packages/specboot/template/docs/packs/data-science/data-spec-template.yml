@@ -1,0 +1,51 @@
+# Dataset contract template.
+# Copy to docs/data/<dataset>.yml and fill in. Loaders in src/<pkg>/data/ must validate against this file.
+
+dataset:
+  name: example_customers
+  version: 1.0.0
+  owner: data-team@example.com
+  description: One row per active customer, refreshed daily.
+
+source:
+  type: warehouse            # warehouse | s3 | api | file
+  location: analytics.dim_customer
+  refresh: daily             # cron-like or human-readable
+  freshness_sla_hours: 26    # max age tolerated before downstream alerts
+
+schema:
+  - name: customer_id
+    dtype: string
+    nullable: false
+    unique: true
+  - name: signup_date
+    dtype: date
+    nullable: false
+  - name: country
+    dtype: string
+    nullable: false
+    allowed_values: [US, CA, MX, BR, ES, GB, DE, FR, OTHER]
+  - name: monthly_revenue_usd
+    dtype: float64
+    nullable: true
+    min: 0
+    max: 1000000
+  - name: is_churned
+    dtype: bool
+    nullable: false
+
+quality_rules:
+  - id: no_future_signups
+    expr: "signup_date <= today()"
+    severity: error
+  - id: revenue_distribution_stable
+    description: "p99 monthly_revenue_usd within 3x of 30-day rolling p99"
+    severity: warn
+
+pii:
+  contains_pii: false
+  notes: "customer_id is a hashed surrogate; no direct identifiers."
+
+lineage:
+  upstream: [raw.stripe_customers, raw.crm_accounts]
+  downstream: [feature_store.customer_features]

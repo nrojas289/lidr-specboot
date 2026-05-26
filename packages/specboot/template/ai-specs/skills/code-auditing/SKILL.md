@@ -7,6 +7,8 @@ version: 1.0.0
 
 Comprehensive methodology for systematic code quality audits.
 
+**Multi-agent execution** (per `docs/base-standards.md` §8): discovery/mapping phases use the **explorer** role (`Task(subagent_type: explorer)` with breadth `thorough`); evaluation, prioritization, and findings use the **reviewer** role (`Task(subagent_type: reviewer)` in `verify` mode). Neither role applies fixes — produce a prioritized action plan; the **orchestrator** routes fixes to the **implementer**.
+
 ## When to Use
 
 - Comprehensive code quality audits

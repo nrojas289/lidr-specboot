@@ -12,23 +12,42 @@ It's highly recommended to be used along with Spec-Driven Development frameworks
 
 ```
 .
-├── docs/                        # Development standards and specifications
-│   ├── base-standards.md        # Core development rules (single source of truth)
-│   ├── backend-standards.md
-│   ├── frontend-standards.md
+├── docs/
+│   ├── base-standards.md            # Universal, stack-agnostic rules (single source of truth)
 │   ├── documentation-standards.md
-│   ├── api-spec.yml             # OpenAPI specification
-│   ├── data-model.md            # Database and domain models
 │   ├── development_guide.md
+│   ├── openspec-tasks-mandatory-steps.md
+│   └── packs/                       # Domain packs (pick one at init time)
+│       ├── web/                     # frontend + backend REST stack
+│       │   ├── frontend-standards.md
+│       │   ├── backend-standards.md
+│       │   ├── api-spec.yml
+│       │   ├── data-model.md
+│       │   └── pack-context.md
+│       └── data-science/            # Python + Jupyter + ML stack
+│           ├── data-science-standards.md
+│           ├── eda-standards.md
+│           ├── modeling-standards.md
+│           ├── data-spec-template.yml
+│           └── pack-context.md
 ├── ai-specs/
-│   ├── agents/                  # Agent role definitions (backend, frontend, analyst, etc.)
-│   └── skills/                  # Reusable skill prompts/workflows
+│   ├── agents/                      # Agnostic agents (e.g. product-strategy-analyst)
+│   ├── packs/<pack>/agents/         # Pack-specific agents (web: frontend/backend-developer; data-science: data-scientist/data-engineer)
+│   └── skills/                      # Reusable pack-agnostic skill prompts/workflows
 │
-├── AGENTS.md                    # Generic agent configuration
-├── CLAUDE.md                    # Claude-specific configuration
-├── codex.md                     # GitHub Copilot/Codex configuration
-└── GEMINI.md                    # Gemini-specific configuration
+├── AGENTS.md / CLAUDE.md / codex.md / GEMINI.md   # All symlink to docs/base-standards.md in target projects
+└── packages/specboot/               # npm package; init.js scaffolds the chosen pack into a target project
 ```
+
+### Available domain packs
+
+| Pack            | Status   | Stack assumed                                   | Bundled agents                       |
+| --------------- | -------- | ----------------------------------------------- | ------------------------------------ |
+| `web`           | ✅ stable | React + Express + Prisma + PostgreSQL (default) | frontend-developer, backend-developer|
+| `data-science`  | ✅ stable | Python ≥3.11, uv/poetry, pandas, scikit-learn   | data-scientist, data-engineer        |
+| `data-engineering` | 🗺️ roadmap | Airflow / dbt / Spark pipelines             | —                                    |
+| `backend-api`   | 🗺️ roadmap | FastAPI / NestJS without frontend              | —                                    |
+| `cli-lib`       | 🗺️ roadmap | CLIs and reusable libraries (Python or Node)   | —                                    |
 
 ## 🤖 Multi-Copilot Support
 
@@ -89,10 +108,19 @@ Alternative for step 2 (Claude Code users):
 Quick install:
 
 ```bash
+# Interactive (prompts for pack)
 npx @lidr/lidr-specboot
+
+# Non-interactive: pick a pack explicitly
+npx @lidr/lidr-specboot --pack web              # default
+npx @lidr/lidr-specboot --pack data-science
+npx @lidr/lidr-specboot --pack none             # base + skills only
+
+# Migrate an existing project that was bootstrapped with the legacy web-only layout
+npx @lidr/lidr-specboot --migrate --pack data-science
 ```
 
-This copies all files into your project and recreates the symlink structure automatically. Safe to re-run: existing files are never overwritten.
+This copies base files plus the chosen pack and recreates the symlink structure automatically. Safe to re-run: existing files are never overwritten. `--migrate` relocates legacy files into `docs/legacy/` non-destructively.
 
 
 ### 3) Customize `docs/` for Your Project (Mandatory)
@@ -196,6 +224,65 @@ Recommended installation approach:
 
 If you don’t use Jira, or you don’t want automated E2E testing in this workflow, just update the skills and keep using the same OpenSpec command flow.
 
+### Adoption flow
+
+#### New project
+
+```bash
+mkdir my-project && cd my-project
+git init
+
+# Bootstrap (interactive prompts for pack; or pass --pack)
+npx @lidr/lidr-specboot --pack web              # or data-science | none
+
+# OpenSpec
+npm install -g @fission-ai/openspec@latest
+openspec init
+
+# Customize docs/ to your real stack
+#   - docs/<pack>-standards.md
+#   - docs/api-spec.yml / docs/data-spec-template.yml (per pack)
+#   - docs/data-model.md (web) or docs/data/<dataset>.yml (data-science)
+
+git add . && git commit -m "chore: bootstrap lidr-specboot (web)"
+```
+
+Then run the per-feature cycle (see *Example: End-to-End Flow* below).
+
+#### Existing project — no prior lidr-specboot
+
+```bash
+cd existing-project
+npx @lidr/lidr-specboot --pack <web|data-science|none>
+```
+
+Idempotent: no existing file is overwritten; only `docs/`, `ai-specs/`, and symlinks are added. Reconcile any pre-existing `CLAUDE.md` with the new symlink target (`docs/base-standards.md`), then customize `docs/<pack>-standards.md` to your real conventions. The existing codebase is left untouched — start using the OpenSpec flow on your next feature.
+
+#### Existing project — legacy web-only layout (pre v0.2.0)
+
+```bash
+cd legacy-project
+npx @lidr/lidr-specboot --migrate --pack <web|data-science>
+```
+
+Detects `docs/frontend-standards.md` etc. at the root of `docs/`, moves them to `docs/legacy/` (non-destructive), then applies the new base + chosen pack. Review `docs/legacy/`, merge anything valuable into the new standards, then delete it.
+
+#### Adding a second pack to an existing project
+
+```bash
+npx @lidr/lidr-specboot --pack data-science
+```
+
+Idempotency means existing files are preserved; only the new pack's files are copied. Both packs can coexist when a project has, for example, a UI and an analytics pipeline.
+
+#### Operational recommendations
+
+- **Pilot one feature end-to-end** (`/enrich-us` → `/commit`) before rolling out to the team.
+- **Tune `docs/<pack>-standards.md` in sprint 1** — defaults are a starting point, not a contract.
+- **Use `using-git-worktrees`** to isolate each feature and avoid clobbering in-progress work.
+- **Human-review the first `architecture.md`** the architect produces, before letting the implementer run.
+- **Always-on rules**: one task at a time; planning workflows (`/enrich-us`, `/ff`) use Opus high, the rest Sonnet; post-`/apply` fixes update OpenSpec artifacts first; English-only in every technical artifact.
+
 ### Example: End-to-End Flow
 
 Use these commands in sequence:
@@ -223,7 +310,21 @@ Skills live in `ai-specs/skills/` and are mirrored into `.claude/skills/` and `.
 - **`writing-skills`** — Author and verify new skills (or refactor existing ones) following TDD-style validation before deployment. Use when adding a skill to `ai-specs/skills/` or editing an existing `SKILL.md`.
 - **`code-auditing`** — Run a systematic 6-phase code quality audit covering security, performance, type safety, dead code, and library best practices, ending with a prioritized action plan. Use for pre-release reviews, technical-debt sweeps, and dependency audits.
 
-Other active skills in this repository: `commit`, `explain`, `meta-prompt`, `update-docs`. See each `ai-specs/skills/<name>/SKILL.md` for the full instructions.
+Other active skills in this repository: `commit`, `explain`, `meta-prompt`, `update-docs`, `role-routing`. See each `ai-specs/skills/<name>/SKILL.md` for the full instructions.
+
+## 🎭 Multi-Agent Roles
+
+Every project bootstrapped with lidr-specboot ships five **transversal role agents** (in `ai-specs/agents/`) that work together instead of loading one monolithic agent:
+
+| Role           | Lane                                                                              |
+| -------------- | --------------------------------------------------------------------------------- |
+| `orchestrator` | Decomposes the US, maintains the living plan, delegates. Never edits code.        |
+| `explorer`     | Read-only discovery: maps code, finds reuse, traces deps. Never proposes.         |
+| `architect`    | Produces the blueprint (files, interfaces, contracts, build order) before code.   |
+| `implementer`  | Executes one task with TDD, strictly following the blueprint.                     |
+| `reviewer`     | Validates vs spec + standards + blueprint. Modes: `verify`, `adversarial`.        |
+
+Pack agents (`frontend-developer`, `data-scientist`, etc.) become **domain consultants** invoked on demand. Full rules in `docs/base-standards.md` §8; decision tree in the `role-routing` skill.
 
 ## 📖 Core Development Rules
 

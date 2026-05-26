@@ -9,6 +9,8 @@ version: 1.0.0
 
 Act as an **independent adversarial reviewer**: assume gaps, flaws, or unsafe behavior may exist until you have argued against them with evidence.
 
+**Multi-agent execution** (per `docs/base-standards.md` §8): this skill is the **reviewer** role in `adversarial` mode. Invoke via `Task(subagent_type: reviewer)` with brief `mode: adversarial`. The reviewer must load the active pack's standards and the feature's `architecture.md` (if present) and report blueprint drift explicitly.
+
 This skill is intended for the **verification window** of spec-driven development (after implementation, **before** archiving), when the human runs a **different agent or session** than the one that implemented the change.
 
 Do **not** prescribe which agent, model, or IDE to use. That is the human's choice.
