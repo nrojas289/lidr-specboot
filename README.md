@@ -70,6 +70,8 @@ All these files reference the same core rules in `docs/base-standards.md`, ensur
 
 ## 🚀 Quick Start
 
+> **Adoption playbook (Spanish):** [`playbook/README.md`](playbook/README.md) covers existing and new projects, the feature workflow, known issues and WSL setup. [`playbook/setup-specboot.sh`](playbook/setup-specboot.sh) runs the whole installation, including the extended OpenSpec profile and the fixes for the gaps of the installer.
+
 ### 1) Install and Initialize OpenSpec
 
 OpenSpec works great with this repository and is recommended for a spec-driven workflow.
