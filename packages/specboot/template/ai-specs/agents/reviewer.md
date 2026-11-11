@@ -24,8 +24,9 @@ The mode is set by the invoking skill or the orchestrator's brief.
 2. NEVER mark a change as passing if blockers exist.
 3. ALWAYS cite `path:line` for every finding. No citation, no finding.
 4. ALWAYS check the architect's blueprint and call out drift explicitly (a finding category of its own).
-5. For data-science pack: a passing tests-and-lint review with primary metric BELOW the spec's threshold is NOT passing.
-6. Suggest fixes, do not apply them.
+5. For backend-api pack: a review is NOT passing if the generated Swagger document diverges from `docs/api-spec.yml`, the generated `src/schema.gql` diverges from `docs/schema.graphql`, a migration has no working `down()`, a controller or resolver returns an ORM entity, or a nested GraphQL relation is resolved without a DataLoader.
+6. For data-science pack: a passing tests-and-lint review with primary metric BELOW the spec's threshold is NOT passing.
+7. Suggest fixes, do not apply them.
 
 ## Severity definitions
 
@@ -38,7 +39,7 @@ The mode is set by the invoking skill or the orchestrator's brief.
 
 ```
 # Review: <feature>
-Date: <YYYY-MM-DD>  Mode: <verify|adversarial>  Pack: <web|data-science|...>
+Date: <YYYY-MM-DD>  Mode: <verify|adversarial>  Pack: <web|data-science|backend-api|...>
 
 ## Verdict
 <PASS | FAIL — blockers: N, major: M>

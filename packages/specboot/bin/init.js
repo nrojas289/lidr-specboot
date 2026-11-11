@@ -5,7 +5,7 @@ const path = require('path');
 const readline = require('readline');
 
 const TEMPLATE_DIR = path.join(__dirname, '..', 'template');
-const AVAILABLE_PACKS = ['web', 'data-science', 'none'];
+const AVAILABLE_PACKS = ['web', 'data-science', 'backend-api', 'none'];
 const DEFAULT_PACK = 'web';
 const LEGACY_WEB_FILES = [
   'docs/frontend-standards.md',
@@ -13,6 +13,14 @@ const LEGACY_WEB_FILES = [
   'docs/api-spec.yml',
   'docs/data-model.md',
 ];
+
+// Base template files that belong to the web stack. They live outside packs/
+// for backwards compatibility, so they are only installed with the web pack.
+const WEB_ONLY_BASE_FILES = new Set([
+  ...LEGACY_WEB_FILES,
+  'ai-specs/agents/backend-developer.md',
+  'ai-specs/agents/frontend-developer.md',
+]);
 
 const stats = { copied: [], skipped: [], linked: [], moved: [], errors: [] };
 
@@ -84,11 +92,13 @@ async function resolvePack(requested) {
   return AVAILABLE_PACKS.includes(ans) ? ans : DEFAULT_PACK;
 }
 
-function copyBase(target) {
+function copyBase(target, pack) {
+  const skipWebOnly = pack !== 'web';
   // docs (excluding packs/)
   const tDocs = path.join(TEMPLATE_DIR, 'docs');
   for (const entry of fs.readdirSync(tDocs, { withFileTypes: true })) {
     if (entry.name === 'packs') continue;
+    if (skipWebOnly && WEB_ONLY_BASE_FILES.has(`docs/${entry.name}`)) continue;
     const src = path.join(tDocs, entry.name);
     const dest = path.join(target, 'docs', entry.name);
     if (entry.isDirectory()) copyRecursive(src, dest, target);
@@ -101,7 +111,15 @@ function copyBase(target) {
     if (entry.name === 'packs') continue;
     const src = path.join(tAi, entry.name);
     const dest = path.join(target, 'ai-specs', entry.name);
-    if (entry.isDirectory()) copyRecursive(src, dest, target);
+    if (entry.isDirectory() && entry.name === 'agents' && skipWebOnly) {
+      ensureDir(dest);
+      for (const agent of fs.readdirSync(src, { withFileTypes: true })) {
+        if (agent.isDirectory() || WEB_ONLY_BASE_FILES.has(`ai-specs/agents/${agent.name}`)) continue;
+        const agentDest = path.join(dest, agent.name);
+        if (pathExists(agentDest)) stats.skipped.push(path.relative(target, agentDest));
+        else { fs.copyFileSync(path.join(src, agent.name), agentDest); stats.copied.push(path.relative(target, agentDest)); }
+      }
+    } else if (entry.isDirectory()) copyRecursive(src, dest, target);
     else if (pathExists(dest)) stats.skipped.push(path.relative(target, dest));
     else { ensureDir(path.dirname(dest)); fs.copyFileSync(src, dest); stats.copied.push(path.relative(target, dest)); }
   }
@@ -116,6 +134,7 @@ function copyPack(target, pack) {
     return;
   }
   // Flatten pack docs into target/docs/
+  ensureDir(path.join(target, 'docs'));
   for (const entry of fs.readdirSync(packDocs, { withFileTypes: true })) {
     if (entry.isDirectory()) continue;
     const src = path.join(packDocs, entry.name);
@@ -200,8 +219,10 @@ async function main() {
   const pack = await resolvePack(args.pack);
   console.log(`  Pack:   ${pack}\n`);
 
-  copyBase(target);
+  // Pack first: when a pack ships a file that also exists in the base template
+  // (e.g. api-spec.yml, data-model.md), the pack's version must win.
   copyPack(target, pack);
+  copyBase(target, pack);
   setupSymlinks(target);
 
   console.log(`  Files copied  ${stats.copied.length}`);

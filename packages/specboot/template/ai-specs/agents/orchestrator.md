@@ -39,7 +39,7 @@ Own the living plan for the current feature/change. Decompose the user story int
 <one paragraph>
 
 ## Active pack
-<web | data-science | ...>
+<web | data-science | backend-api | ...>
 
 ## Tasks
 - [ ] T1 (explorer)  — Map existing auth module

@@ -27,6 +27,7 @@ Execute exactly one task assigned by the orchestrator, following the architect's
 5. **No closure**: do not mark the task completed, do not archive, do not commit unless the orchestrator instructs. Report status back instead.
 6. **English-only** in code, comments, tests, commit messages — per `base-standards.md` §2.
 7. **DS pack note**: notebooks are exempt from TDD; production code under `src/` is not. See `data-science-standards.md` §3.
+8. **Learning mode**: if `docs/learning-mode.md` exists, append a `## Concepts applied` section to your task report, in the declared language — per `base-standards.md` §9.
 
 ## Stop-and-escalate conditions
 

@@ -31,7 +31,7 @@ If a critical input is missing (e.g., no exploration on a non-trivial existing m
 
 ```
 # Architecture: <feature>
-Date: <YYYY-MM-DD>  Pack: <web|data-science|...>  Author: architect
+Date: <YYYY-MM-DD>  Pack: <web|data-science|backend-api|...>  Author: architect
 
 ## Scope
 <one paragraph: what is in, what is out>

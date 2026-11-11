@@ -24,15 +24,21 @@ It's highly recommended to be used along with Spec-Driven Development frameworks
 │       │   ├── api-spec.yml
 │       │   ├── data-model.md
 │       │   └── pack-context.md
-│       └── data-science/            # Python + Jupyter + ML stack
-│           ├── data-science-standards.md
-│           ├── eda-standards.md
-│           ├── modeling-standards.md
-│           ├── data-spec-template.yml
+│       ├── data-science/            # Python + Jupyter + ML stack
+│       │   ├── data-science-standards.md
+│       │   ├── eda-standards.md
+│       │   ├── modeling-standards.md
+│       │   ├── data-spec-template.yml
+│       │   └── pack-context.md
+│       └── backend-api/             # NestJS + TypeORM + PostgreSQL, no frontend
+│           ├── backend-api-standards.md
+│           ├── api-spec.yml             # REST contract
+│           ├── schema.graphql           # GraphQL contract
+│           ├── data-model.md
 │           └── pack-context.md
 ├── ai-specs/
 │   ├── agents/                      # Agnostic agents (e.g. product-strategy-analyst)
-│   ├── packs/<pack>/agents/         # Pack-specific agents (web: frontend/backend-developer; data-science: data-scientist/data-engineer)
+│   ├── packs/<pack>/agents/         # Pack-specific agents (web: frontend/backend-developer; data-science: data-scientist/data-engineer; backend-api: nestjs-developer)
 │   └── skills/                      # Reusable pack-agnostic skill prompts/workflows
 │
 ├── AGENTS.md / CLAUDE.md / codex.md / GEMINI.md   # All symlink to docs/base-standards.md in target projects
@@ -46,7 +52,8 @@ It's highly recommended to be used along with Spec-Driven Development frameworks
 | `web`           | ✅ stable | React + Express + Prisma + PostgreSQL (default) | frontend-developer, backend-developer|
 | `data-science`  | ✅ stable | Python ≥3.11, uv/poetry, pandas, scikit-learn   | data-scientist, data-engineer        |
 | `data-engineering` | 🗺️ roadmap | Airflow / dbt / Spark pipelines             | —                                    |
-| `backend-api`   | 🗺️ roadmap | FastAPI / NestJS without frontend              | —                                    |
+| `backend-api`   | ✅ stable | NestJS + TypeORM + PostgreSQL, REST and/or GraphQL, no frontend | nestjs-developer       |
+| `backend-api` (FastAPI) | 🗺️ roadmap | FastAPI without frontend              | —                                    |
 | `cli-lib`       | 🗺️ roadmap | CLIs and reusable libraries (Python or Node)   | —                                    |
 
 ## 🤖 Multi-Copilot Support
@@ -116,6 +123,7 @@ npx @lidr/lidr-specboot
 # Non-interactive: pick a pack explicitly
 npx @lidr/lidr-specboot --pack web              # default
 npx @lidr/lidr-specboot --pack data-science
+npx @lidr/lidr-specboot --pack backend-api      # NestJS + TypeORM API
 npx @lidr/lidr-specboot --pack none             # base + skills only
 
 # Migrate an existing project that was bootstrapped with the legacy web-only layout
@@ -235,7 +243,7 @@ mkdir my-project && cd my-project
 git init
 
 # Bootstrap (interactive prompts for pack; or pass --pack)
-npx @lidr/lidr-specboot --pack web              # or data-science | none
+npx @lidr/lidr-specboot --pack web              # or data-science | backend-api | none
 
 # OpenSpec
 npm install -g @fission-ai/openspec@latest
@@ -244,7 +252,7 @@ openspec init
 # Customize docs/ to your real stack
 #   - docs/<pack>-standards.md
 #   - docs/api-spec.yml / docs/data-spec-template.yml (per pack)
-#   - docs/data-model.md (web) or docs/data/<dataset>.yml (data-science)
+#   - docs/data-model.md (web, backend-api) or docs/data/<dataset>.yml (data-science)
 
 git add . && git commit -m "chore: bootstrap lidr-specboot (web)"
 ```
@@ -255,7 +263,7 @@ Then run the per-feature cycle (see *Example: End-to-End Flow* below).
 
 ```bash
 cd existing-project
-npx @lidr/lidr-specboot --pack <web|data-science|none>
+npx @lidr/lidr-specboot --pack <web|data-science|backend-api|none>
 ```
 
 Idempotent: no existing file is overwritten; only `docs/`, `ai-specs/`, and symlinks are added. Reconcile any pre-existing `CLAUDE.md` with the new symlink target (`docs/base-standards.md`), then customize `docs/<pack>-standards.md` to your real conventions. The existing codebase is left untouched — start using the OpenSpec flow on your next feature.
@@ -283,7 +291,8 @@ Idempotency means existing files are preserved; only the new pack's files are co
 - **Tune `docs/<pack>-standards.md` in sprint 1** — defaults are a starting point, not a contract.
 - **Use `using-git-worktrees`** to isolate each feature and avoid clobbering in-progress work.
 - **Human-review the first `architecture.md`** the architect produces, before letting the implementer run.
-- **Always-on rules**: one task at a time; planning workflows (`/enrich-us`, `/ff`) use Opus high, the rest Sonnet; post-`/apply` fixes update OpenSpec artifacts first; English-only in every technical artifact.
+- **Always-on rules**: one task at a time; planning workflows (`/enrich-us`, `/ff`) use Opus high, the rest Sonnet; post-`/apply` fixes update OpenSpec artifacts first; English-only in every technical artifact (chat replies follow the user's language).
+- **Learning mode (optional)**: create `docs/learning-mode.md` (language, level, focus) and the implementer appends a short *Concepts applied* note to each task explaining the patterns and SOLID principles used. See `docs/base-standards.md` §9.
 
 ### Example: End-to-End Flow
 

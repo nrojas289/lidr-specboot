@@ -7,7 +7,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 `lidr-specboot` is a **portable AI-agent configuration template** that bootstraps Spec-Driven Development (OpenSpec) in any project. It ships:
 
 - `docs/base-standards.md` — universal, stack-agnostic rules (single source of truth)
-- `docs/packs/<pack>/` — domain packs (standards + examples per stack). Official packs: `web`, `data-science`. Roadmap: `data-engineering`, `backend-api`, `cli-lib`.
+- `docs/packs/<pack>/` — domain packs (standards + examples per stack). Official packs: `web`, `data-science`, `backend-api`. Roadmap: `data-engineering`, `cli-lib`.
 - `ai-specs/agents/` — agnostic agents shared across packs
 - `ai-specs/packs/<pack>/agents/` — pack-specific agents
 - `ai-specs/skills/` — reusable, pack-agnostic skill prompts
@@ -16,7 +16,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Domain packs
 
-A target project picks one pack at init time (`--pack web|data-science|none`, default `web`). `init.js` copies base files plus the chosen pack's standards (into `docs/`) and agents (into `ai-specs/agents/`), then sets up symlinks. Existing projects on the legacy web-only layout can run `npx @lidr/lidr-specboot --migrate --pack <name>` to relocate legacy files into `docs/legacy/` non-destructively.
+A target project picks one pack at init time (`--pack web|data-science|backend-api|none`, default `web`). `init.js` copies base files plus the chosen pack's standards (into `docs/`) and agents (into `ai-specs/agents/`), then sets up symlinks. Existing projects on the legacy web-only layout can run `npx @lidr/lidr-specboot --migrate --pack <name>` to relocate legacy files into `docs/legacy/` non-destructively.
 
 ## Core Rules
 
@@ -26,7 +26,7 @@ All development follows `docs/base-standards.md`. Key constraints:
 - **English only**: all code, comments, docs, commit messages
 - **Small steps**: one task at a time, never skip ahead
 - **Fully typed**: TypeScript everywhere
-- **Planning workflows** (`enrich-us`, `openspec-ff-change`, `openspec-continue-change`) require **Opus high reasoning** — set `"model": "claude-opus-4-7"` in `.claude/settings.json` before starting, then revert to Sonnet
+- **Planning workflows** (`enrich-us`, `openspec-ff-change`, `openspec-continue-change`) require **Opus high reasoning** — set `"model": "claude-opus-5-5"` in `.claude/settings.json` before starting, then revert to Sonnet
 
 ## Multi-Agent Execution Model
 
@@ -38,7 +38,7 @@ The base ships five **transversal role agents** (in `ai-specs/agents/`, copied i
 - `implementer` — executes one task with TDD against the blueprint. Never designs.
 - `reviewer` — validates vs spec + standards + blueprint. Modes: `verify`, `adversarial`. Never applies fixes.
 
-Pack-specific agents (`frontend-developer`, `backend-developer`, `data-scientist`, `data-engineer`) act as **domain consultants** invoked by roles when stack-specific advice is needed. Full rules in `docs/base-standards.md` §8; routing decision tree in the `role-routing` skill.
+Pack-specific agents (`frontend-developer`, `backend-developer`, `data-scientist`, `data-engineer`, `nestjs-developer`) act as **domain consultants** invoked by roles when stack-specific advice is needed. Full rules in `docs/base-standards.md` §8; routing decision tree in the `role-routing` skill.
 
 ## Symlink Architecture
 

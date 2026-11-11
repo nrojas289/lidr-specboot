@@ -2,7 +2,7 @@
 # Instala OpenSpec + lidr-specboot en un proyecto y corrige los huecos
 # conocidos del instalador (ver playbook/README.md, "Problemas conocidos").
 #
-#   playbook/setup-specboot.sh <directorio-proyecto> --pack <web|data-science|none> [--tools claude,cursor]
+#   playbook/setup-specboot.sh <directorio-proyecto> --pack <web|data-science|backend-api|none> [--tools claude,cursor]
 #
 # Es idempotente: nunca sobrescribe archivos existentes y solo borra
 # archivos que siguen idénticos a la plantilla.
@@ -36,7 +36,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 [[ -n "$TARGET" && -n "$PACK" ]] || usage 2
-case "$PACK" in web|data-science|none) ;; *) echo "Pack desconocido: $PACK" >&2; exit 2 ;; esac
+case "$PACK" in web|data-science|backend-api|none) ;; *) echo "Pack desconocido: $PACK" >&2; exit 2 ;; esac
 
 step() { printf '\n==> %s\n' "$*"; }
 note() { printf '    %s\n' "$*"; }

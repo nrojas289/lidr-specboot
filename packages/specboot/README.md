@@ -35,8 +35,9 @@ Safe to re-run: existing files are never overwritten; the run reports `copied`, 
 | --------------- | -------- |
 | `web`           | ✅ stable (default) |
 | `data-science`  | ✅ stable |
+| `backend-api`   | ✅ stable (NestJS + TypeORM, REST and/or GraphQL) |
 | `none`          | ✅ base + skills only |
-| `data-engineering` / `backend-api` / `cli-lib` | 🗺️ roadmap |
+| `data-engineering` / `cli-lib` / FastAPI variant of `backend-api` | 🗺️ roadmap |
 
 See the top-level repo README for the full pack catalogue and roadmap.
 

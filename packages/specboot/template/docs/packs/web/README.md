@@ -24,4 +24,4 @@ Default pack for full-stack web applications (frontend + backend REST API).
 
 ## When to choose this pack
 
-Choose `web` when building a customer-facing application with a UI and a REST backend. For pure API services without frontend, prefer the upcoming `backend-api` pack. For landing pages and static sites, this pack also applies; skip the backend standards when irrelevant.
+Choose `web` when building a customer-facing application with a UI and a REST backend. For pure API services without frontend, prefer the `backend-api` pack (NestJS + TypeORM). For landing pages and static sites, this pack also applies; skip the backend standards when irrelevant.

@@ -80,7 +80,7 @@ Además:
 ### Opción recomendada: script
 
 ```sh
-~/tools/lidr-specboot/playbook/setup-specboot.sh <ruta-proyecto> --pack <web|data-science|none> [--tools claude,cursor]
+~/tools/lidr-specboot/playbook/setup-specboot.sh <ruta-proyecto> --pack <web|data-science|backend-api|none> [--tools claude,cursor]
 ```
 
 El script es idempotente (se puede repetir) y hace, en orden:
@@ -99,6 +99,7 @@ El script es idempotente (se puede repetir) y hace, en orden:
 |---|---|
 | `web` | El stack es exactamente React + Express + Prisma + PostgreSQL. Trae estándares ya escritos. |
 | `data-science` | Python ≥ 3.11, pandas, scikit-learn, notebooks. |
+| `backend-api` | API sin frontend con NestJS + TypeORM + PostgreSQL, REST y/o GraphQL (Jest + Supertest, Swagger, Apollo). Elegir el estilo en `docs/pack-context.md`. |
 | `none` | Cualquier otro caso (librerías, otros frameworks, CLI, móvil...). Los estándares se escriben a medida. |
 
 ### Instalación manual (si no puedes usar el script)
@@ -328,7 +329,8 @@ grep -rn "base-standards.md\` §\|base-standards.md\` (§" ai-specs docs
 | `openspec-sync-specs` duplicada | OpenSpec ya la genera | No crear symlink: `openspec update` la regenera y lo rompería |
 | `development_guide.md` habla de "LTI ATS" | La plantilla es el proyecto de ejemplo | Reescribirla siempre |
 | Los estándares aparecen como páginas en el sitio de docs | Specboot usa `docs/`, que también puede ser un sitio | Excluirlos (`srcExclude` en VitePress, `exclude` en Docusaurus/MkDocs) |
-| `base-standards.md` pide `claude-opus-4-7` | Versión del modelo en la plantilla | Actualizar al Opus vigente en la sección "Planning Model" |
+| `base-standards.md` pide un Opus antiguo | Versión del modelo en la plantilla (ya actualizada a `claude-opus-5-5`) | Si sale un Opus más nuevo, actualizar la sección "Planning Model" y `.claude/settings.json` |
+| Quiero explicaciones en español mientras aprendo | El idioma de los artefactos es inglés | Crear `docs/learning-mode.md` con `Language: es` (ver §9 de `base-standards.md`); el código y los commits siguen en inglés |
 | Symlinks rotos o como archivos de texto | Repo clonado en `/mnt/c/...` o con `core.symlinks=false` | Trabajar en el sistema de archivos de WSL |
 
 ---

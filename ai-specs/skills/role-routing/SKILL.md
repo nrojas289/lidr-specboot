@@ -31,7 +31,8 @@ Is this a non-trivial change (>3 steps OR touches >1 module OR needs discovery)?
    Need stack-specific advice (React patterns, Prisma, scikit-learn, etc.)?
    → domain consultant: <pack-agent-name>
        e.g. frontend-developer, backend-developer,
-            data-scientist, data-engineer
+            data-scientist, data-engineer,
+            nestjs-developer
 ```
 
 ## Quick lookup by slash command
@@ -60,7 +61,7 @@ Every subagent is stateless. Include:
 
 1. Role and mode (e.g. "reviewer in adversarial mode").
 2. Feature name and `.claude/doc/<feature>/` path.
-3. Active pack (`web` | `data-science` | ...).
+3. Active pack (`web` | `data-science` | `backend-api` | ...).
 4. Specific question or task scope.
 5. Required inputs (paths to spec, architecture.md, exploration reports).
 6. Expected output path and format.

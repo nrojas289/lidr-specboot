@@ -24,6 +24,7 @@ alwaysApply: true
     - Git commit messages
     - Test names and descriptions
     - Notebook narrative and section headers
+- **Conversation language**: replies, explanations and questions addressed to the user (chat, not artifacts) use the user's language. If `docs/learning-mode.md` declares a language (§9), use it; otherwise mirror the language the user writes in. Artifacts stay in English.
 
 ## 3. Domain Packs
 
@@ -31,7 +32,7 @@ This project is configured with one or more **domain packs** that live in `docs/
 
 - The active pack(s) declare themselves in `docs/<pack>-standards.md` and an optional `docs/pack-context.md`.
 - Always load the active pack's standards alongside this file before starting work.
-- Available official packs: `web`, `data-science`. Roadmap: `data-engineering`, `backend-api`, `cli-lib`.
+- Available official packs: `web`, `data-science`, `backend-api`. Roadmap: `data-engineering`, `cli-lib`.
 
 Refer to:
 
@@ -53,7 +54,7 @@ Planning workflows must run with Opus high reasoning. This applies to:
 - `openspec-ff-change`
 - `openspec-continue-change`
 
-Before starting any of these workflows, verify the session is using Opus high reasoning. If it is not, **self-correct** by adding `"model": "claude-opus-4-7"` to `.claude/settings.json` (use the `update-config` skill or edit directly), then continue — do not stop and ask the user. Revert to Sonnet medium for any other step.
+Before starting any of these workflows, verify the session is using Opus high reasoning. If it is not, **self-correct** by adding `"model": "claude-opus-5-5"` to `.claude/settings.json` (use the `update-config` skill or edit directly), then continue — do not stop and ask the user. Revert to Sonnet medium for any other step.
 
 ## 6. Symlink Integrity and Multi-Agent Portability
 
@@ -102,3 +103,23 @@ Non-trivial work is executed by **five transversal roles** living in `ai-specs/a
 
 **Role routing**: see the `role-routing` skill for the decision tree.
 
+## 9. Learning Mode (optional)
+
+Learning mode turns each task into a short lesson for a developer who is building skills while shipping. It is **on** when `docs/learning-mode.md` exists. That file declares:
+
+```markdown
+# Learning Mode
+- Language: es            # language for concept notes and chat explanations
+- Level: junior           # junior | mid — controls depth
+- Focus: OOP, SOLID, design patterns, NestJS, TypeORM, testing
+```
+
+When on:
+
+- **Implementer**: after the task's tests pass, append a `## Concepts applied` section to its task report (in the declared language, ≤ 15 lines): which pattern(s) and SOLID principle(s) the code uses, where (file and symbol), why this choice over one alternative, and one pitfall to watch for.
+- **Architect / domain consultants**: keep the "Patterns and concepts" section of their plans (see pack agents).
+- **Reviewer**: may add `learning` notes (non-blocking) that explain *why* a finding matters, separate from severities.
+- The user can ask for a deeper explanation of any note with the `explain` skill.
+- Learning notes never change artifacts' language: code, commits and docs remain in English (§2).
+
+When off (file absent): skip all of the above.
